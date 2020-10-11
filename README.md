@@ -2,6 +2,8 @@
 
 Generate or inject "Table of Contents" for markdown file.
 
+<img src="https://i.imgur.com/eLQzctc.gif" width="600" />
+
 ## Contents
 
 - [toc-md](#toc-md)
