@@ -8,7 +8,7 @@ import (
 )
 
 // GenerateToc generates the TOC for a given file.
-func GenerateToc(lines []string) []string {
+func GenerateToc(lines []string, maxDepth int) []string {
 	// Regular Expressions
 	regTitle := regexp.MustCompile(`#+(.*)`)
 	regHeading := regexp.MustCompile(`(?m)^[^\s]*#\s`)
@@ -24,6 +24,13 @@ func GenerateToc(lines []string) []string {
 			heading := regTitle.FindStringSubmatch(line)
 
 			currentHeading := strings.Count(heading[0], "#")
+
+			// if a maximum depth is set, and the current heading's depth is
+			// over that maximum, just ignore it.
+			if maxDepth > 0 && maxDepth < currentHeading {
+				continue
+			}
+
 			lowerHeading := strings.ToLower(heading[1])
 			kebabHeading := strings.ReplaceAll(strings.TrimSpace(lowerHeading), " ", "-")
 			title := strings.TrimSpace(heading[1])
@@ -35,16 +42,16 @@ func GenerateToc(lines []string) []string {
 				continue
 			}
 
-			if prevHeading == currentHeading{
+			if prevHeading == currentHeading {
 				lastitem := store[len(store)-1]
 
 				spaces := countLeadingSpaces(lastitem)
 				store = append(store, fmt.Sprintf("%*s- [%s](#%s)", spaces, "", title, kebabHeading))
 			}
 
-			if prevHeading > currentHeading || prevHeading < currentHeading{
-					spaces := currentHeading * 2
-					store = append(store, fmt.Sprintf("%*s- [%s](#%s)", spaces, "", title, kebabHeading))
+			if prevHeading > currentHeading || prevHeading < currentHeading {
+				spaces := currentHeading * 2
+				store = append(store, fmt.Sprintf("%*s- [%s](#%s)", spaces, "", title, kebabHeading))
 			}
 
 		}
