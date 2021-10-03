@@ -3,12 +3,13 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"github.com/urfave/cli/v2"
-	"github.com/yankeexe/toc-md/actions"
-	"github.com/yankeexe/toc-md/utils"
 	"log"
 	"os"
 	"path/filepath"
+
+	"github.com/urfave/cli/v2"
+	"github.com/yankeexe/toc-md/actions"
+	"github.com/yankeexe/toc-md/utils"
 )
 
 func main() {
@@ -26,6 +27,12 @@ func main() {
 					Usage:   "Inject TOC to file",
 					Aliases: []string{"i"},
 				},
+				&cli.IntFlag{
+					Name:    "depth",
+					Usage:   "Depth of TOC to generate; the default 0 means that the depth is unlimited",
+					Aliases: []string{"d"},
+					Value:   0,
+				},
 			},
 
 			Action: func(c *cli.Context) error {
@@ -37,7 +44,7 @@ func main() {
 				}
 
 				// Get argument value
-				inject := c.Args().Get(1)
+				inject := c.Bool("inject")
 				fileLocation := c.Args().Get(0)
 				extension := filepath.Ext(fileLocation)
 
@@ -55,10 +62,10 @@ func main() {
 					lines = append(lines, scanner.Text())
 				}
 
-				result := actions.GenerateToc(lines)
+				result := actions.GenerateToc(lines, c.Int("depth"))
 
 				// Inject to file or stdout.
-				if inject != "" {
+				if inject {
 					actions.InjectToc(lines, result, file)
 				} else {
 					for _, item := range result {
